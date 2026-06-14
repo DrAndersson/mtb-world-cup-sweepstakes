@@ -155,7 +155,6 @@
         <a class="hover:text-white" href="#leaderboard">Leaderboard</a>
         <a class="hover:text-white" href="#teams">Teams</a>
         <a class="hover:text-white" href="#matches">Matches</a>
-        <a class="hover:text-white" href="#data">Data</a>
       </nav>
       <span id="sourceBadge" class="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-2 text-xs font-bold uppercase tracking-[.18em] text-cyan-100">
         <span class="pulse-dot h-2 w-2 rounded-full bg-cyan-300"></span>
@@ -326,21 +325,6 @@
           </div>
         </div>
       </section>
-
-      <section id="data" class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div class="glass rounded-3xl p-5 sm:p-6">
-          <div class="mb-5 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-            <div>
-              <p class="text-sm font-black uppercase tracking-[.22em] text-trophy">Admin / Data</p>
-              <h2 class="mt-2 text-3xl font-black text-white sm:text-4xl">Edit The Sweepstakes Here</h2>
-            </div>
-            <span class="rounded-full border border-white/10 bg-black/25 px-4 py-2 text-sm font-bold text-white/62">Single-file, no backend required</span>
-          </div>
-          <p class="max-w-3xl leading-7 text-white/62">Player names, team assignments, scoring rules, API source, team-name aliases, and cache settings are stored in the JavaScript `CONFIG` object near the top of the script. The preview below mirrors the editable parts so they are easy to find.</p>
-          <pre class="mt-5 max-h-[34rem] overflow-auto rounded-2xl border border-white/10 bg-black/45 p-4 text-xs leading-6 text-cyan-50/86"><code id="configPreview"></code></pre>
-        </div>
-      </section>
-    </main>
 
     <footer class="mx-auto max-w-7xl px-4 py-10 text-center text-sm text-white/52 sm:px-6 lg:px-8">
       <p class="font-semibold">Built for bragging rights, heartbreak, and suspicious VAR decisions.</p>
@@ -1007,7 +991,6 @@
       renderBarChart(standings);
       renderTimeline(standings);
       renderWhatIf(standings);
-      renderConfigPreview();
       renderSourceStatus(data);
     }
 
