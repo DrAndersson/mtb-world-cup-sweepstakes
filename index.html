@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>World Cup Sweepstakes HQ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pitch: "#071811",
+            pitch2: "#0b2a1c",
+            line: "rgba(255,255,255,.12)",
+            trophy: "#f7c948",
+            amber: "#ffb020",
+            ice: "#d9fff0",
+          },
+          boxShadow: {
+            glow: "0 0 42px rgba(247, 201, 72, .22)",
+            panel: "0 20px 80px rgba(0,0,0,.36)",
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --gold: #f7c948;
+      --green: #0d3b27;
+      --cyan: #53f5d0;
+      --red: #ff6b6b;
+      --blue: #69a7ff;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 16% 0%, rgba(247, 201, 72, .18), transparent 28rem),
+        radial-gradient(circle at 88% 12%, rgba(83, 245, 208, .13), transparent 30rem),
+        linear-gradient(140deg, #06130e 0%, #082016 45%, #06100d 100%);
+      color: #f7fff9;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, transparent 49%, rgba(255,255,255,.06) 50%, transparent 51%);
+      background-size: 52px 52px, 52px 52px, 100% 100%;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.85), rgba(0,0,0,.2) 78%, transparent);
+    }
+
+    .glass {
+      border: 1px solid rgba(255,255,255,.13);
+      background: linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.055));
+      box-shadow: 0 18px 60px rgba(0,0,0,.28);
+      backdrop-filter: blur(18px);
+    }
+
+    .gold-glass {
+      border: 1px solid rgba(247, 201, 72, .42);
+      background:
+        linear-gradient(145deg, rgba(247, 201, 72, .21), rgba(255,255,255,.07)),
+        radial-gradient(circle at 80% 10%, rgba(247, 201, 72, .22), transparent 16rem);
+      box-shadow: 0 24px 90px rgba(0,0,0,.38), 0 0 45px rgba(247, 201, 72, .16);
+      backdrop-filter: blur(20px);
+    }
+
+    .ticker-window {
+      min-height: 4.35rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ticker-track {
+      animation: ticker 38s linear infinite;
+      left: 0;
+      position: absolute;
+      top: 50%;
+      width: max-content;
+    }
+
+    @keyframes ticker {
+      from { transform: translate3d(0, -50%, 0); }
+      to { transform: translate3d(-50%, -50%, 0); }
+    }
+
+    .pulse-dot {
+      box-shadow: 0 0 0 0 rgba(83, 245, 208, .65);
+      animation: pulseDot 1.8s infinite;
+    }
+
+    @keyframes pulseDot {
+      70% { box-shadow: 0 0 0 10px rgba(83, 245, 208, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(83, 245, 208, 0); }
+    }
+
+    .progress-ring {
+      --p: 50;
+      background: conic-gradient(var(--gold) calc(var(--p) * 1%), rgba(255,255,255,.12) 0);
+    }
+
+    .status-upcoming { background: rgba(105, 167, 255, .16); color: #b9d5ff; border-color: rgba(105, 167, 255, .35); }
+    .status-playing { background: rgba(83, 245, 208, .16); color: #b9fff0; border-color: rgba(83, 245, 208, .45); }
+    .status-won { background: rgba(34, 197, 94, .18); color: #bbf7d0; border-color: rgba(34, 197, 94, .42); }
+    .status-drew { background: rgba(247, 201, 72, .16); color: #fff0b3; border-color: rgba(247, 201, 72, .4); }
+    .status-lost { background: rgba(255, 107, 107, .15); color: #fecaca; border-color: rgba(255, 107, 107, .36); }
+    .status-qualified { background: rgba(247, 201, 72, .2); color: #ffef9c; border-color: rgba(247, 201, 72, .48); }
+    .status-eliminated { background: rgba(148, 163, 184, .14); color: #cbd5e1; border-color: rgba(148, 163, 184, .32); }
+
+    details > summary {
+      list-style: none;
+    }
+
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: .65rem;
+      top: 2.4rem;
+      bottom: -1.2rem;
+      width: 1px;
+      background: rgba(255,255,255,.16);
+    }
+
+    .timeline-item:last-child::before {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="relative z-10">
+    <header class="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
+      <a href="#" class="flex items-center gap-3" aria-label="World Cup Sweepstakes HQ home">
+        <span class="grid h-10 w-10 place-items-center rounded-full border border-trophy/50 bg-trophy/15 text-lg font-black text-trophy">WC</span>
+        <span class="hidden text-sm font-semibold uppercase tracking-[.24em] text-ice/80 sm:block">Sweepstakes HQ</span>
+      </a>
+      <nav class="hidden items-center gap-5 text-sm text-white/70 md:flex">
+        <a class="hover:text-white" href="#leaderboard">Leaderboard</a>
+        <a class="hover:text-white" href="#teams">Teams</a>
+        <a class="hover:text-white" href="#matches">Matches</a>
+        <a class="hover:text-white" href="#data">Data</a>
+      </nav>
+      <span id="sourceBadge" class="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-2 text-xs font-bold uppercase tracking-[.18em] text-cyan-100">
+        <span class="pulse-dot h-2 w-2 rounded-full bg-cyan-300"></span>
+        Loading data
+      </span>
+    </header>
+
+    <main>
+      <section class="mx-auto grid max-w-7xl items-center gap-8 px-4 pb-10 pt-4 sm:px-6 md:grid-cols-[1.05fr_.95fr] lg:px-8 lg:pb-16">
+        <div>
+          <div class="mb-5 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-white/75">
+            <span class="h-2 w-2 rounded-full bg-trophy"></span>
+            <span id="statusLine">Checking ESPN once-daily data cache</span>
+          </div>
+          <h1 class="max-w-4xl text-5xl font-black leading-[.96] tracking-normal text-white sm:text-6xl lg:text-7xl">World Cup Sweepstakes HQ</h1>
+          <p class="mt-5 max-w-2xl text-xl font-medium text-white/72">12 players. 48 teams. One champion.</p>
+          <p class="mt-4 max-w-2xl text-base leading-7 text-white/58">A private command center for the draw, the table, the heartbreak, and every suspiciously convenient stoppage-time goal.</p>
+
+          <div class="ticker-window mt-8 rounded-2xl border border-white/10 bg-black/25">
+            <div id="matchTicker" class="ticker-track flex w-max gap-3 px-3 py-3"></div>
+          </div>
+        </div>
+
+        <div class="grid gap-5">
+          <div class="gold-glass rounded-3xl p-5 sm:p-6">
+            <div class="grid gap-5 sm:grid-cols-[1fr_190px] sm:items-center">
+              <div>
+                <p class="text-xs font-black uppercase tracking-[.22em] text-trophy">Current Leader</p>
+                <h2 id="leaderName" class="mt-2 text-4xl font-black text-white">Loading</h2>
+                <div class="mt-4 flex flex-wrap items-end gap-4">
+                  <div>
+                    <p class="text-xs uppercase tracking-[.18em] text-white/55">Points</p>
+                    <p id="leaderPoints" class="text-5xl font-black text-trophy">0</p>
+                  </div>
+                  <div>
+                    <p class="text-xs uppercase tracking-[.18em] text-white/55">Teams Alive</p>
+                    <p id="leaderAlive" class="text-3xl font-black text-white">0/4</p>
+                  </div>
+                </div>
+                <div id="leaderTeams" class="mt-5 flex flex-wrap gap-2"></div>
+              </div>
+
+              <div class="relative mx-auto aspect-square w-44 sm:w-full">
+                <svg viewBox="0 0 240 240" role="img" aria-label="Trophy and stadium lights" class="h-full w-full drop-shadow-[0_0_28px_rgba(247,201,72,.28)]">
+                  <defs>
+                    <linearGradient id="cupGold" x1="0" x2="1" y1="0" y2="1">
+                      <stop offset="0" stop-color="#fff3a0"/>
+                      <stop offset=".45" stop-color="#f7c948"/>
+                      <stop offset="1" stop-color="#b7791f"/>
+                    </linearGradient>
+                    <radialGradient id="ballLight" cx=".38" cy=".22" r=".8">
+                      <stop offset="0" stop-color="#ffffff"/>
+                      <stop offset=".7" stop-color="#d9fff0"/>
+                      <stop offset="1" stop-color="#77ccb7"/>
+                    </radialGradient>
+                  </defs>
+                  <path d="M34 58C52 28 83 20 120 20s68 8 86 38" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="7" stroke-linecap="round"/>
+                  <path d="M56 62h128v28c0 39-25 71-52 78v22h32v22H76v-22h32v-22c-27-7-52-39-52-78V62Z" fill="url(#cupGold)"/>
+                  <path d="M56 75H31c2 39 23 64 53 70" fill="none" stroke="url(#cupGold)" stroke-width="15" stroke-linecap="round"/>
+                  <path d="M184 75h25c-2 39-23 64-53 70" fill="none" stroke="url(#cupGold)" stroke-width="15" stroke-linecap="round"/>
+                  <circle cx="120" cy="105" r="34" fill="url(#ballLight)" opacity=".95"/>
+                  <path d="m120 76 18 13-7 22h-22l-7-22 18-13Zm-29 50 18-15m40 15-18-15m-11 28v-28" fill="none" stroke="#0b2a1c" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M42 220h156" stroke="rgba(247,201,72,.75)" stroke-width="8" stroke-linecap="round"/>
+                  <path d="M23 37 68 94M217 37l-45 57M120 8v54" stroke="rgba(255,255,255,.22)" stroke-width="5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div class="glass rounded-2xl p-4">
+              <p class="text-xs uppercase tracking-[.16em] text-white/45">Players</p>
+              <p class="mt-1 text-3xl font-black">12</p>
+            </div>
+            <div class="glass rounded-2xl p-4">
+              <p class="text-xs uppercase tracking-[.16em] text-white/45">Teams</p>
+              <p class="mt-1 text-3xl font-black">48</p>
+            </div>
+            <div class="glass rounded-2xl p-4">
+              <p class="text-xs uppercase tracking-[.16em] text-white/45">Prize Pot</p>
+              <p class="mt-1 text-3xl font-black">900</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="leaderboard" class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p class="text-sm font-black uppercase tracking-[.22em] text-trophy">Leaderboard</p>
+            <h2 class="mt-2 text-3xl font-black text-white sm:text-4xl">The Bragging Rights Table</h2>
+          </div>
+          <div class="glass flex items-center gap-3 rounded-2xl px-4 py-3">
+            <div id="aliveRing" class="progress-ring grid h-14 w-14 place-items-center rounded-full">
+              <div class="grid h-10 w-10 place-items-center rounded-full bg-pitch text-xs font-black text-white">0%</div>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-[.18em] text-white/45">Teams Alive</p>
+              <p id="aliveSummary" class="font-black text-white">0 of 48</p>
+            </div>
+          </div>
+        </div>
+        <div id="leaderboardGrid" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
+      </section>
+
+      <section id="teams" class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div class="mb-6">
+          <p class="text-sm font-black uppercase tracking-[.22em] text-trophy">Team Ownership</p>
+          <h2 class="mt-2 text-3xl font-black text-white sm:text-4xl">All 48 Teams By Player</h2>
+        </div>
+        <div id="ownershipGrid" class="grid gap-4 lg:grid-cols-2"></div>
+      </section>
+
+      <section id="matches" class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div class="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+          <div>
+            <p class="text-sm font-black uppercase tracking-[.22em] text-trophy">Live Match Centre</p>
+            <h2 class="mt-2 text-3xl font-black text-white sm:text-4xl">Results, Fixtures, Impact</h2>
+          </div>
+          <label class="glass flex max-w-xl items-center gap-3 rounded-2xl px-4 py-3">
+            <span class="text-sm font-bold text-white/70">What if</span>
+            <select id="whatIfTeam" class="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-sm font-bold text-white outline-none">
+            </select>
+            <span id="whatIfImpact" class="whitespace-nowrap text-sm font-black text-trophy">+0 pts</span>
+          </label>
+        </div>
+
+        <div class="grid gap-5 lg:grid-cols-3">
+          <div>
+            <h3 class="mb-3 text-lg font-black">Latest Results</h3>
+            <div id="latestResults" class="grid gap-3"></div>
+          </div>
+          <div>
+            <h3 class="mb-3 text-lg font-black">Today's Matches</h3>
+            <div id="todayMatches" class="grid gap-3"></div>
+          </div>
+          <div>
+            <h3 class="mb-3 text-lg font-black">Upcoming Matches</h3>
+            <div id="upcomingMatches" class="grid gap-3"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div class="grid gap-5 lg:grid-cols-[.95fr_1.05fr]">
+          <div class="glass rounded-3xl p-5 sm:p-6">
+            <p class="text-sm font-black uppercase tracking-[.22em] text-trophy">How It Works</p>
+            <h2 class="mt-2 text-3xl font-black">How The Leaderboard Is Calculated</h2>
+            <p class="mt-4 leading-7 text-white/62">This page pulls fixtures and results from ESPN's public FIFA World Cup scoreboard, caches the response in this browser for one day, then matches teams to sweepstakes owners and applies the scoring rules from the Excel sheet. Matches that have not been played stay scheduled/upcoming instead of being guessed.</p>
+
+            <div class="mt-6 grid gap-3 sm:grid-cols-4">
+              <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <p class="text-2xl font-black text-cyan-200">01</p>
+                <p class="mt-2 text-sm font-bold">Fetch fixtures/results</p>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <p class="text-2xl font-black text-cyan-200">02</p>
+                <p class="mt-2 text-sm font-bold">Match teams to owners</p>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <p class="text-2xl font-black text-cyan-200">03</p>
+                <p class="mt-2 text-sm font-bold">Apply scoring rules</p>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <p class="text-2xl font-black text-cyan-200">04</p>
+                <p class="mt-2 text-sm font-bold">Update table</p>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <h3 class="mb-3 text-lg font-black">Scoring Rules From Workbook</h3>
+              <div id="scoringRules" class="grid gap-2"></div>
+            </div>
+          </div>
+
+          <div class="grid gap-5">
+            <div class="glass rounded-3xl p-5 sm:p-6">
+              <div class="mb-4 flex items-center justify-between gap-4">
+                <h3 class="text-lg font-black">Mini Points Bar Chart</h3>
+                <span id="standingsSourceLabel" class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold text-white/60">Live source</span>
+              </div>
+              <div id="barChart" class="grid gap-3"></div>
+            </div>
+
+            <div class="glass rounded-3xl p-5 sm:p-6">
+              <h3 class="text-lg font-black">Trophy Race Timeline</h3>
+              <div id="timeline" class="mt-4 grid gap-4"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="data" class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div class="glass rounded-3xl p-5 sm:p-6">
+          <div class="mb-5 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+            <div>
+              <p class="text-sm font-black uppercase tracking-[.22em] text-trophy">Admin / Data</p>
+              <h2 class="mt-2 text-3xl font-black text-white sm:text-4xl">Edit The Sweepstakes Here</h2>
+            </div>
+            <span class="rounded-full border border-white/10 bg-black/25 px-4 py-2 text-sm font-bold text-white/62">Single-file, no backend required</span>
+          </div>
+          <p class="max-w-3xl leading-7 text-white/62">Player names, team assignments, scoring rules, API source, team-name aliases, and cache settings are stored in the JavaScript `CONFIG` object near the top of the script. The preview below mirrors the editable parts so they are easy to find.</p>
+          <pre class="mt-5 max-h-[34rem] overflow-auto rounded-2xl border border-white/10 bg-black/45 p-4 text-xs leading-6 text-cyan-50/86"><code id="configPreview"></code></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mx-auto max-w-7xl px-4 py-10 text-center text-sm text-white/52 sm:px-6 lg:px-8">
+      <p class="font-semibold">Built for bragging rights, heartbreak, and suspicious VAR decisions.</p>
+      <p class="mt-2">Last updated: <span id="lastUpdated">Checking data source</span></p>
+    </footer>
+  </div>
+
+  <script>
+    /*
+      ADMIN DATA SECTION
+      Edit this CONFIG object to update player names, team assignments, scoring rules,
+      football data source, team-name aliases, and the future API endpoint.
+
+      API integration idea:
+      The default source is ESPN's public FIFA World Cup scoreboard. It is checked at
+      most once per day in this browser via localStorage. If the fetch fails, the
+      page shows empty/scheduled states rather than invented results.
+    */
+    const CONFIG = {
+      api: {
+        mode: "espn",
+        sourceName: "ESPN FIFA World Cup scoreboard",
+        endpoint: "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard",
+        tournamentStart: "2026-06-11",
+        tournamentEnd: "2026-07-19",
+        daysAhead: 14,
+        cacheKey: "wc-sweepstakes-hq-espn-cache-v1",
+      },
+      scoringRules: [
+        { label: "Group win", points: 2, note: "Total group wins, 2 points each" },
+        { label: "Group draw", points: 1, note: "Total group draws, 1 point each" },
+        { label: "Group winner bonus", points: 4, note: "Per team finishing first in group" },
+        { label: "Group runner-up bonus", points: 2, note: "Per team finishing second in group" },
+        { label: "Third-place qualifier bonus", points: 1, note: "Per third-place team that qualifies" },
+        { label: "Reach round of 32", points: 2, note: "Per team reaching the first knockout round" },
+        { label: "Win round of 32", points: 4, note: "Per knockout win" },
+        { label: "Win round of 16", points: 6, note: "Per knockout win" },
+        { label: "Win quarter-final", points: 8, note: "Per knockout win" },
+        { label: "Win semi-final", points: 10, note: "Per knockout win" },
+        { label: "Win final", points: 12, note: "Champion bonus" },
+        { label: "Runner-up final", points: 6, note: "Losing finalist bonus" },
+        { label: "Win third-place final", points: 3, note: "Third-place playoff winner" },
+      ],
+      prizePot: [
+        { place: "1st, most points", amount: 500 },
+        { place: "2nd", amount: 250 },
+        { place: "3rd", amount: 100 },
+        { place: "Team largest defeat", amount: 50 },
+      ],
+      tieBreakers: [
+        "If tied on points, number of highest placed teams wins.",
+        "For equal largest-defeat team, winner is the person with the lowest total points.",
+      ],
+      players: [
+        { name: "Gustav", teams: ["Germany", "Morocco", "Algeria", "Cape Verde"] },
+        { name: "Jordan", teams: ["Brazil", "Australia", "Panama", "Iraq"] },
+        { name: "Lev", teams: ["England", "Japan", "Paraguay", "New Zealand"] },
+        { name: "Ludvig", teams: ["Portugal", "Uruguay", "Egypt", "Ghana"] },
+        { name: "Lukas", teams: ["Mexico", "Colombia", "Norway", "Bosnia & H"] },
+        { name: "Mikko", teams: ["Spain", "Switzerland", "Uzbekistan", "Haiti"] },
+        { name: "Nick", teams: ["Argentina", "Senegal", "Qatar", "Czech Rep"] },
+        { name: "Olov", teams: ["Netherlands", "Iran", "Scotland", "DR Congo"] },
+        { name: "Paul", teams: ["Canada", "Austria", "Ivory Coast", "Sweden"] },
+        { name: "Peyman", teams: ["Belgium", "S. Korea", "Saudi Arabia", "Jordan"] },
+        { name: "Roine", teams: ["France", "Ecuador", "Tunisia", "Turkey"] },
+        { name: "Stig", teams: ["USA", "Croatia", "South Africa", "Curacao"] },
+      ],
+      teamAliases: {
+        "Bosnia and Herzegovina": "Bosnia & H",
+        "Cabo Verde": "Cape Verde",
+        "Cape Verde": "Cape Verde",
+        "Congo DR": "DR Congo",
+        "Congo Democratic Republic": "DR Congo",
+        "Côte d'Ivoire": "Ivory Coast",
+        "Cote d'Ivoire": "Ivory Coast",
+        "Curacao": "Curacao",
+        "Curaçao": "Curacao",
+        "Czechia": "Czech Rep",
+        "Czech Republic": "Czech Rep",
+        "IR Iran": "Iran",
+        "Iran": "Iran",
+        "Korea Republic": "S. Korea",
+        "Saudi Arabia": "Saudi Arabia",
+        "Türkiye": "Turkey",
+        "Turkiye": "Turkey",
+        "United States": "USA",
+        "United States of America": "USA",
+        "USA": "USA",
+      },
+    };
+
+    const STATUS_CLASS = {
+      Upcoming: "status-upcoming",
+      Playing: "status-playing",
+      Won: "status-won",
+      Drew: "status-drew",
+      Lost: "status-lost",
+      Qualified: "status-qualified",
+      Eliminated: "status-eliminated",
+    };
+
+    const trendMeta = {
+      up: { icon: "▲", label: "Up", color: "text-emerald-200" },
+      down: { icon: "▼", label: "Down", color: "text-red-200" },
+      same: { icon: "▬", label: "Unchanged", color: "text-white/55" },
+    };
+
+    function initials(team) {
+      return team.split(/\s|&|\./).filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase();
+    }
+
+    function ownerOf(team) {
+      return CONFIG.players.find(player => player.teams.includes(team))?.name || "Unowned";
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function allSweepstakesTeams() {
+      return CONFIG.players.flatMap(player => player.teams);
+    }
+
+    function canonicalTeamName(providerName) {
+      return CONFIG.teamAliases[providerName] || providerName;
+    }
+
+    function dateToEspn(value) {
+      return value.replaceAll("-", "");
+    }
+
+    function addDays(date, days) {
+      const copy = new Date(date);
+      copy.setDate(copy.getDate() + days);
+      return copy;
+    }
+
+    function isoDate(date) {
+      return date.toISOString().slice(0, 10);
+    }
+
+    function daysBetween(start, end) {
+      const dates = [];
+      const cursor = new Date(`${start}T12:00:00Z`);
+      const final = new Date(`${end}T12:00:00Z`);
+      while (cursor <= final) {
+        dates.push(isoDate(cursor));
+        cursor.setDate(cursor.getDate() + 1);
+      }
+      return dates;
+    }
+
+    function readDailyCache(todayKey) {
+      try {
+        const cached = JSON.parse(localStorage.getItem(CONFIG.api.cacheKey) || "null");
+        if (cached?.fetchedFor === todayKey && cached?.data) return cached.data;
+      } catch (error) {
+        console.warn("Could not read ESPN cache", error);
+      }
+      return null;
+    }
+
+    function writeDailyCache(todayKey, data) {
+      try {
+        localStorage.setItem(CONFIG.api.cacheKey, JSON.stringify({ fetchedFor: todayKey, data }));
+      } catch (error) {
+        console.warn("Could not write ESPN cache", error);
+      }
+    }
+
+    async function fetchEspnScoreboards() {
+      const today = new Date();
+      const todayIso = isoDate(today);
+      const fetchThrough = isoDate(new Date(Math.min(
+        addDays(today, CONFIG.api.daysAhead).getTime(),
+        new Date(`${CONFIG.api.tournamentEnd}T12:00:00Z`).getTime()
+      )));
+      const cached = readDailyCache(todayIso);
+      if (cached) return { ...cached, cacheStatus: "Using today's cached ESPN data" };
+
+      const dates = daysBetween(CONFIG.api.tournamentStart, fetchThrough);
+      const requests = dates.map(async date => {
+        const url = `${CONFIG.api.endpoint}?dates=${dateToEspn(date)}&limit=100`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`ESPN ${response.status} for ${date}`);
+        return response.json();
+      });
+      const scoreboards = await Promise.all(requests);
+      const payload = {
+        fetchedAt: new Date().toLocaleString(),
+        fetchedFor: todayIso,
+        sourceName: CONFIG.api.sourceName,
+        scoreboards,
+      };
+      writeDailyCache(todayIso, payload);
+      return { ...payload, cacheStatus: "Fetched fresh ESPN data" };
+    }
+
+    function emptyWorldCupData(reason = "No online data loaded yet") {
+      const teamPerformance = Object.fromEntries(allSweepstakesTeams().map(team => [
+        team,
+        { status: "Upcoming", groupWins: 0, groupDraws: 0, recent: 0, alive: true },
+      ]));
+      return {
+        sourceName: CONFIG.api.sourceName,
+        sourceStatus: reason,
+        lastUpdated: reason,
+        teamPerformance,
+        matches: [],
+      };
+    }
+
+    function getStage(event, competition) {
+      return competition?.altGameNote || event?.season?.slug?.replaceAll("-", " ") || "World Cup";
+    }
+
+    function getGroupName(stage) {
+      const match = String(stage).match(/Group\s+([A-L])/i);
+      return match ? `Group ${match[1].toUpperCase()}` : null;
+    }
+
+    function knockoutKey(stage) {
+      const value = String(stage).toLowerCase();
+      if (value.includes("round of 32") || value.includes("rd of 32")) return "r32Win";
+      if (value.includes("round of 16") || value.includes("rd of 16")) return "r16Win";
+      if (value.includes("quarter")) return "qfWin";
+      if (value.includes("semi")) return "semiWin";
+      if (value.includes("third") || value.includes("3rd")) return "thirdPlaceWin";
+      if (value.includes("final")) return "finalWin";
+      return null;
+    }
+
+    function ensureTeam(performance, team) {
+      if (!performance[team]) {
+        performance[team] = { status: "Upcoming", groupWins: 0, groupDraws: 0, recent: 0, alive: true };
+      }
+      return performance[team];
+    }
+
+    function pointsImpactFor(match) {
+      const ownerA = ownerOf(match.a);
+      const ownerB = ownerOf(match.b);
+      if (match.type === "latest") {
+        return match.score ? `${ownerA} / ${ownerB} updated from result` : "Result recorded";
+      }
+      const stage = String(match.stage).toLowerCase();
+      if (stage.includes("group")) return `Win +2, draw +1 for ${ownerA} / ${ownerB}`;
+      if (stage.includes("round of 32")) return `Winner +4 for ${ownerA} or ${ownerB}`;
+      if (stage.includes("round of 16")) return `Winner +6 for ${ownerA} or ${ownerB}`;
+      if (stage.includes("quarter")) return `Winner +8 for ${ownerA} or ${ownerB}`;
+      if (stage.includes("semi")) return `Winner +10 for ${ownerA} or ${ownerB}`;
+      if (stage.includes("final")) return `Final points at stake for ${ownerA} / ${ownerB}`;
+      return `Potential points for ${ownerA} / ${ownerB}`;
+    }
+
+    function normalizeEspnData(payload) {
+      const teamPerformance = Object.fromEntries(allSweepstakesTeams().map(team => [
+        team,
+        { status: "Upcoming", groupWins: 0, groupDraws: 0, recent: 0, alive: true },
+      ]));
+      const groupTables = {};
+      const matches = [];
+
+      payload.scoreboards.forEach(scoreboard => {
+        (scoreboard.events || []).forEach(event => {
+          const competition = event.competitions?.[0];
+          const competitors = competition?.competitors || [];
+          if (competitors.length < 2) return;
+
+          const home = competitors.find(item => item.homeAway === "home") || competitors[0];
+          const away = competitors.find(item => item.homeAway === "away") || competitors[1];
+          const homeName = canonicalTeamName(home.team?.displayName || home.team?.shortDisplayName || home.team?.name);
+          const awayName = canonicalTeamName(away.team?.displayName || away.team?.shortDisplayName || away.team?.name);
+          const homeScore = Number(home.score || 0);
+          const awayScore = Number(away.score || 0);
+          const stage = getStage(event, competition);
+          const statusType = competition?.status?.type || {};
+          const completed = Boolean(statusType.completed);
+          const state = statusType.state || "pre";
+          const kickoff = new Date(competition?.date || event.date);
+          const todayKey = isoDate(new Date());
+          const matchDateKey = isoDate(kickoff);
+          const match = {
+            type: completed ? "latest" : matchDateKey === todayKey ? "today" : "upcoming",
+            a: homeName,
+            b: awayName,
+            score: completed ? `${homeScore}-${awayScore}` : "",
+            time: completed ? "" : kickoff.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }),
+            stage,
+            sortTime: kickoff.getTime(),
+          };
+          match.impact = pointsImpactFor(match);
+          matches.push(match);
+
+          [homeName, awayName].forEach(team => ensureTeam(teamPerformance, team));
+
+          if (state === "in") {
+            teamPerformance[homeName].status = "Playing";
+            teamPerformance[awayName].status = "Playing";
+          }
+
+          if (!completed) return;
+
+          const homePerf = ensureTeam(teamPerformance, homeName);
+          const awayPerf = ensureTeam(teamPerformance, awayName);
+          const drew = homeScore === awayScore;
+          const group = getGroupName(stage);
+
+          if (drew) {
+            homePerf.status = "Drew";
+            awayPerf.status = "Drew";
+            homePerf.groupDraws += group ? 1 : 0;
+            awayPerf.groupDraws += group ? 1 : 0;
+            homePerf.recent += group ? 1 : 0;
+            awayPerf.recent += group ? 1 : 0;
+          } else {
+            const winnerName = homeScore > awayScore ? homeName : awayName;
+            const loserName = homeScore > awayScore ? awayName : homeName;
+            const winner = ensureTeam(teamPerformance, winnerName);
+            const loser = ensureTeam(teamPerformance, loserName);
+            winner.status = "Won";
+            loser.status = "Lost";
+            if (group) {
+              winner.groupWins += 1;
+              winner.recent += 2;
+            } else {
+              const key = knockoutKey(stage);
+              if (key) {
+                winner[key] = true;
+                winner.recent += scoreTeam({ [key]: true });
+              }
+              loser.alive = false;
+              if (String(stage).toLowerCase().includes("final")) loser.runnerUp = true;
+            }
+          }
+
+          if (group) {
+            groupTables[group] ||= {};
+            [
+              [homeName, homeScore, awayScore],
+              [awayName, awayScore, homeScore],
+            ].forEach(([team, goalsFor, goalsAgainst]) => {
+              groupTables[group][team] ||= { team, played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, points: 0 };
+              const row = groupTables[group][team];
+              row.played += 1;
+              row.gf += goalsFor;
+              row.ga += goalsAgainst;
+              if (goalsFor > goalsAgainst) {
+                row.wins += 1;
+                row.points += 3;
+              } else if (goalsFor === goalsAgainst) {
+                row.draws += 1;
+                row.points += 1;
+              } else {
+                row.losses += 1;
+              }
+            });
+          }
+        });
+      });
+
+      Object.values(groupTables).forEach(group => {
+        const table = Object.values(group).sort((a, b) =>
+          b.points - a.points || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf || a.team.localeCompare(b.team)
+        );
+        const groupComplete = table.length >= 4 && table.every(row => row.played >= 3);
+        if (!groupComplete) return;
+        table.forEach((row, index) => {
+          const perf = ensureTeam(teamPerformance, row.team);
+          perf.groupPosition = index + 1;
+          if (index === 0) {
+            perf.status = "Qualified";
+          } else if (index === 1) {
+            perf.status = "Qualified";
+          } else if (index === 2) {
+            perf.thirdQualified = false;
+          } else if (index > 2) {
+            perf.status = "Eliminated";
+            perf.alive = false;
+          }
+        });
+      });
+
+      const latest = matches.filter(match => match.type === "latest").sort((a, b) => b.sortTime - a.sortTime).slice(0, 6);
+      const today = matches.filter(match => match.type === "today").sort((a, b) => a.sortTime - b.sortTime);
+      const upcoming = matches.filter(match => match.type === "upcoming").sort((a, b) => a.sortTime - b.sortTime).slice(0, 8);
+
+      return {
+        sourceName: payload.sourceName,
+        sourceStatus: payload.cacheStatus,
+        lastUpdated: `${payload.cacheStatus}: ${payload.fetchedAt}`,
+        teamPerformance,
+        matches: [...latest, ...today, ...upcoming],
+      };
+    }
+
+    async function fetchWorldCupData() {
+      try {
+        const payload = await fetchEspnScoreboards();
+        return normalizeEspnData(payload);
+      } catch (error) {
+        console.warn("ESPN data load failed", error);
+        return emptyWorldCupData("ESPN data unavailable; showing no guessed match results");
+      }
+    }
+
+    function scoreTeam(performance = {}) {
+      let score = 0;
+      score += (performance.groupWins || 0) * 2;
+      score += (performance.groupDraws || 0) * 1;
+      if (performance.groupPosition === 1) score += 4;
+      if (performance.groupPosition === 2) score += 2;
+      if (performance.thirdQualified) score += 1;
+      if (performance.reachedR32) score += 2;
+      if (performance.r32Win) score += 4;
+      if (performance.r16Win) score += 6;
+      if (performance.qfWin) score += 8;
+      if (performance.semiWin) score += 10;
+      if (performance.finalWin) score += 12;
+      if (performance.runnerUp) score += 6;
+      if (performance.thirdPlaceWin) score += 3;
+      return score;
+    }
+
+    function calculateLeaderboard(data) {
+      return CONFIG.players.map(player => {
+        const teams = player.teams.map(team => {
+          const performance = data.teamPerformance[team] || { status: "Upcoming", alive: true };
+          return {
+            name: team,
+            ...performance,
+            points: scoreTeam(performance),
+          };
+        });
+        const total = teams.reduce((sum, team) => sum + team.points, 0);
+        const recent = teams.reduce((sum, team) => sum + (team.recent || 0), 0);
+        const alive = teams.filter(team => team.alive && team.status !== "Eliminated").length;
+        return { ...player, teams, total, recent, alive };
+      }).sort((a, b) => b.total - a.total || b.alive - a.alive || a.name.localeCompare(b.name))
+        .map((player, index) => ({ ...player, rank: index + 1 }));
+    }
+
+    function teamPill(team, status) {
+      return `<span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-2.5 py-1 text-xs font-bold text-white/78">
+        <span class="grid h-5 w-5 place-items-center rounded-full bg-white/12 text-[10px] text-trophy">${initials(team)}</span>
+        ${escapeHtml(team)}
+        ${status ? `<span class="hidden text-white/38 sm:inline">·</span><span class="hidden text-white/52 sm:inline">${escapeHtml(status)}</span>` : ""}
+      </span>`;
+    }
+
+    function statusPill(status) {
+      return `<span class="${STATUS_CLASS[status] || "status-upcoming"} rounded-full border px-2.5 py-1 text-[11px] font-black uppercase tracking-[.12em]">${escapeHtml(status)}</span>`;
+    }
+
+    function renderHero(leader) {
+      document.getElementById("leaderName").textContent = leader.name;
+      document.getElementById("leaderPoints").textContent = leader.total;
+      document.getElementById("leaderAlive").textContent = `${leader.alive}/4`;
+      document.getElementById("leaderTeams").innerHTML = leader.teams.map(team => teamPill(team.name, team.status)).join("");
+    }
+
+    function renderTicker(matches) {
+      if (!matches.length) {
+        document.getElementById("matchTicker").innerHTML = `<div class="flex min-w-max items-center gap-3 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white/70">
+          No fixtures found in the current online data window
+        </div>`;
+        return;
+      }
+      const items = matches.map(match => {
+        const detail = match.score || match.time;
+        return `<div class="flex min-w-max items-center gap-3 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm">
+          <span class="font-black text-trophy">${escapeHtml(match.stage)}</span>
+          <span class="text-white/82">${escapeHtml(match.a)} vs ${escapeHtml(match.b)}</span>
+          <span class="rounded-full bg-black/30 px-2 py-1 text-xs font-black text-white">${escapeHtml(detail)}</span>
+          <span class="text-white/52">${escapeHtml(match.impact)}</span>
+        </div>`;
+      }).join("");
+      document.getElementById("matchTicker").innerHTML = items + items;
+    }
+
+    function renderLeaderboard(standings) {
+      const leaderName = standings[0].name;
+      document.getElementById("leaderboardGrid").innerHTML = standings.map(player => {
+        const trend = trendMeta[player.trend] || trendMeta.same;
+        const isLeader = player.name === leaderName;
+        return `<article class="${isLeader ? "gold-glass" : "glass"} rounded-3xl p-5">
+          <div class="mb-4 flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="grid h-11 w-11 place-items-center rounded-2xl ${isLeader ? "bg-trophy text-pitch" : "bg-white/10 text-white"} text-lg font-black">#${player.rank}</span>
+              <div>
+                <h3 class="text-xl font-black">${escapeHtml(player.name)}</h3>
+                <p class="text-xs uppercase tracking-[.18em] text-white/45">${player.alive} teams alive</p>
+              </div>
+            </div>
+            <span class="${trend.color} text-sm font-black" title="${trend.label}">${trend.icon} ${trend.label}</span>
+          </div>
+          <div class="mb-4 flex items-end justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-[.18em] text-white/45">Total points</p>
+              <p class="text-4xl font-black ${isLeader ? "text-trophy" : "text-white"}">${player.total}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs uppercase tracking-[.18em] text-white/45">Recent</p>
+              <p class="text-2xl font-black text-cyan-100">+${player.recent}</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2">${player.teams.map(team => teamPill(team.name, team.status)).join("")}</div>
+        </article>`;
+      }).join("");
+
+      const alive = standings.reduce((sum, player) => sum + player.alive, 0);
+      const pct = Math.round((alive / 48) * 100);
+      const ring = document.getElementById("aliveRing");
+      ring.style.setProperty("--p", pct);
+      ring.querySelector("div").textContent = `${pct}%`;
+      document.getElementById("aliveSummary").textContent = `${alive} of 48`;
+    }
+
+    function renderOwnership(standings) {
+      document.getElementById("ownershipGrid").innerHTML = standings.map(player => `
+        <article class="glass rounded-3xl p-5">
+          <div class="mb-4 flex items-center justify-between">
+            <h3 class="text-xl font-black">${escapeHtml(player.name)}</h3>
+            <span class="rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs font-bold text-white/55">${player.total} pts</span>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2">
+            ${player.teams.map(team => `
+              <div class="rounded-2xl border border-white/10 bg-black/20 p-3">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="flex min-w-0 items-center gap-3">
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/10 text-xs font-black text-trophy">${initials(team.name)}</span>
+                    <div class="min-w-0">
+                      <p class="truncate font-black">${escapeHtml(team.name)}</p>
+                      <p class="text-xs text-white/45">${team.points} points</p>
+                    </div>
+                  </div>
+                  ${statusPill(team.status)}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderMatchCard(match) {
+      const ownerA = ownerOf(match.a);
+      const ownerB = ownerOf(match.b);
+      return `<details class="glass rounded-2xl p-4">
+        <summary class="cursor-pointer">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="truncate text-sm font-black">${escapeHtml(match.a)} <span class="text-white/38">vs</span> ${escapeHtml(match.b)}</p>
+              <p class="mt-1 text-xs text-white/45">${escapeHtml(match.stage)}</p>
+            </div>
+            <span class="rounded-xl bg-trophy/15 px-3 py-2 text-sm font-black text-trophy">${escapeHtml(match.score || match.time)}</span>
+          </div>
+        </summary>
+        <div class="mt-4 grid gap-3 border-t border-white/10 pt-4 text-sm text-white/68">
+          <p><span class="font-bold text-white">Owners:</span> ${escapeHtml(match.a)} = ${escapeHtml(ownerA)}, ${escapeHtml(match.b)} = ${escapeHtml(ownerB)}</p>
+          <p><span class="font-bold text-white">Potential impact:</span> ${escapeHtml(match.impact)}</p>
+        </div>
+      </details>`;
+    }
+
+    function renderMatches(matches) {
+      const empty = `<div class="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-white/52">No matches found for this bucket.</div>`;
+      const latest = matches.filter(m => m.type === "latest").map(renderMatchCard).join("");
+      const today = matches.filter(m => m.type === "today").map(renderMatchCard).join("");
+      const upcoming = matches.filter(m => m.type === "upcoming").map(renderMatchCard).join("");
+      document.getElementById("latestResults").innerHTML = latest || empty;
+      document.getElementById("todayMatches").innerHTML = today || empty;
+      document.getElementById("upcomingMatches").innerHTML = upcoming || empty;
+    }
+
+    function renderScoring() {
+      const rules = CONFIG.scoringRules.map(rule => `
+        <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+          <div>
+            <p class="font-bold">${escapeHtml(rule.label)}</p>
+            <p class="text-xs text-white/45">${escapeHtml(rule.note)}</p>
+          </div>
+          <span class="rounded-full bg-trophy/15 px-3 py-1 text-sm font-black text-trophy">+${rule.points}</span>
+        </div>
+      `).join("");
+      const tieBreakers = CONFIG.tieBreakers.map(rule => `<p class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/60">${escapeHtml(rule)}</p>`).join("");
+      document.getElementById("scoringRules").innerHTML = rules + tieBreakers;
+    }
+
+    function renderBarChart(standings) {
+      const max = Math.max(1, ...standings.map(player => player.total));
+      document.getElementById("barChart").innerHTML = standings.map(player => {
+        const width = Math.max(8, Math.round((player.total / max) * 100));
+        return `<div class="grid grid-cols-[5.5rem_1fr_2.5rem] items-center gap-3 text-sm">
+          <span class="truncate font-bold text-white/72">${escapeHtml(player.name)}</span>
+          <span class="h-3 overflow-hidden rounded-full bg-white/10">
+            <span class="block h-full rounded-full bg-gradient-to-r from-cyan-300 to-trophy" style="width:${width}%"></span>
+          </span>
+          <span class="text-right font-black">${player.total}</span>
+        </div>`;
+      }).join("");
+    }
+
+    function renderTimeline(standings) {
+      const topFour = standings.slice(0, 4);
+      document.getElementById("timeline").innerHTML = topFour.map((player, index) => `
+        <div class="timeline-item relative flex gap-4">
+          <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full ${index === 0 ? "bg-trophy text-pitch" : "bg-white/10 text-white"} text-xs font-black">${index + 1}</span>
+          <div>
+            <p class="font-black">${escapeHtml(player.name)} <span class="text-trophy">${player.total} pts</span></p>
+            <p class="text-sm text-white/52">${player.teams.filter(team => team.alive).map(team => team.name).join(", ") || "No teams alive"}</p>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderWhatIf(standings) {
+      const allTeams = standings.flatMap(player => player.teams.map(team => ({ ...team, owner: player.name })));
+      const select = document.getElementById("whatIfTeam");
+      select.innerHTML = allTeams.map(team => `<option value="${escapeHtml(team.name)}">${escapeHtml(team.name)} (${escapeHtml(team.owner)})</option>`).join("");
+      const impact = document.getElementById("whatIfImpact");
+      const update = () => {
+        const team = allTeams.find(item => item.name === select.value);
+        const bonus = team?.status === "Playing" || team?.status === "Upcoming" ? 4 : 2;
+        impact.textContent = `${team?.owner || "Owner"} +${bonus} pts`;
+      };
+      select.addEventListener("change", update);
+      update();
+    }
+
+    function renderConfigPreview() {
+      const preview = {
+        api: CONFIG.api,
+        scoringRules: CONFIG.scoringRules,
+        players: CONFIG.players,
+        teamAliases: CONFIG.teamAliases,
+      };
+      document.getElementById("configPreview").textContent = JSON.stringify(preview, null, 2);
+    }
+
+    function renderSourceStatus(data) {
+      document.getElementById("sourceBadge").lastChild.textContent = data.sourceStatus?.includes("unavailable") ? "Data unavailable" : "ESPN data";
+      document.getElementById("statusLine").textContent = data.sourceStatus || "Checked ESPN once-daily cache";
+      document.getElementById("standingsSourceLabel").textContent = data.sourceName || "Online standings";
+      document.getElementById("lastUpdated").textContent = data.lastUpdated;
+    }
+
+    async function init() {
+      const data = await fetchWorldCupData();
+      const standings = calculateLeaderboard(data);
+      renderHero(standings[0]);
+      renderTicker(data.matches);
+      renderLeaderboard(standings);
+      renderOwnership(standings);
+      renderMatches(data.matches);
+      renderScoring();
+      renderBarChart(standings);
+      renderTimeline(standings);
+      renderWhatIf(standings);
+      renderConfigPreview();
+      renderSourceStatus(data);
+    }
+
+    init();
+  </script>
+</body>
+</html>
