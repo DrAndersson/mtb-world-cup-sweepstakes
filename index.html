@@ -351,6 +351,7 @@
         tournamentStart: "2026-06-11",
         tournamentEnd: "2026-07-19",
         daysAhead: 14,
+        cacheMinutes: 30,
         cacheKey: "wc-sweepstakes-hq-espn-cache-v1",
       },
       scoringRules: [
@@ -487,23 +488,29 @@
       return dates;
     }
 
-    function readDailyCache(todayKey) {
-      try {
-        const cached = JSON.parse(localStorage.getItem(CONFIG.api.cacheKey) || "null");
-        if (cached?.fetchedFor === todayKey && cached?.data) return cached.data;
-      } catch (error) {
-        console.warn("Could not read ESPN cache", error);
-      }
-      return null;
-    }
+function readDailyCache(todayKey) {
+  try {
+    const cached = JSON.parse(localStorage.getItem(CONFIG.api.cacheKey) || "null");
+    const ageMs = Date.now() - (cached?.savedAt || 0);
+    const maxAgeMs = CONFIG.api.cacheMinutes * 60 * 1000;
+    if (cached?.fetchedFor === todayKey && cached?.data && ageMs < maxAgeMs) return cached.data;
+  } catch (error) {
+    console.warn("Could not read ESPN cache", error);
+  }
+  return null;
+}
 
-    function writeDailyCache(todayKey, data) {
-      try {
-        localStorage.setItem(CONFIG.api.cacheKey, JSON.stringify({ fetchedFor: todayKey, data }));
-      } catch (error) {
-        console.warn("Could not write ESPN cache", error);
-      }
-    }
+function writeDailyCache(todayKey, data) {
+  try {
+    localStorage.setItem(CONFIG.api.cacheKey, JSON.stringify({
+      fetchedFor: todayKey,
+      savedAt: Date.now(),
+      data
+    }));
+  } catch (error) {
+    console.warn("Could not write ESPN cache", error);
+  }
+}
 
     async function fetchEspnScoreboards() {
       const today = new Date();
@@ -513,7 +520,7 @@
         new Date(`${CONFIG.api.tournamentEnd}T12:00:00Z`).getTime()
       )));
       const cached = readDailyCache(todayIso);
-      if (cached) return { ...cached, cacheStatus: "Using today's cached ESPN data" };
+      if (cached) return { ...cached, cacheStatus: "Using recently cached ESPN data" };
 
       const dates = daysBetween(CONFIG.api.tournamentStart, fetchThrough);
       const requests = dates.map(async date => {
