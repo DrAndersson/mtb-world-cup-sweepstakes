@@ -143,6 +143,15 @@
       object-fit: contain;
     }
 
+    .broadcast-fade {
+      animation: broadcastFade .45s ease-out;
+    }
+
+    @keyframes broadcastFade {
+      from { opacity: .35; transform: scale(.985); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
     @keyframes ticker {
       from { transform: translate3d(0, -50%, 0); }
       to { transform: translate3d(-50%, -50%, 0); }
@@ -446,10 +455,15 @@
         enabled: true,
         label: "Fan TV",
         headline: "Cape Verde Held Spain. This Is Not A Drill.",
-        caption: "OMG.",
+        caption: "Rotates through whatever GIFs, images, or videos you add to mediaItems.",
         mood: "Chaos",
+        rotateSeconds: 7,
+        mediaItems: [
+          { type: "image", src: "cape-verde.png", alt: "Cape Verde draw celebration" },
+          { type: "image", src: "peyman-ludvig.png", alt: "Peyman vs Ludvig clash" },
+        ],
         mediaType: "image", // placeholder, image, gif, video
-        mediaSrc: "cape-verde.png", // Example: "cape-verde.gif", "var-celebration.mp4", or "meme.png"
+        mediaSrc: "cape-verde.png", // Fallback if mediaItems is empty.
         poster: "", // Optional still image for video files.
         alt: "Cape Verde draw celebration",
       },
@@ -534,6 +548,8 @@
       same: { icon: "▬", label: "Unchanged", color: "text-white/55" },
     };
 
+    let spotlightTimer = null;
+
     function initials(team) {
       return team.split(/\s|&|\./).filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase();
     }
@@ -561,6 +577,47 @@
       return "placeholder";
     }
 
+    function spotlightMediaItems(config) {
+      const configuredItems = Array.isArray(config.mediaItems)
+        ? config.mediaItems.filter(item => String(item.src || "").trim())
+        : [];
+
+      if (configuredItems.length) {
+        return configuredItems.map(item => {
+          const src = String(item.src || "").trim();
+          return {
+            src,
+            type: mediaTypeFromSource(src, item.type),
+            alt: item.alt || config.alt || "Sweepstakes spotlight media",
+            poster: item.poster || config.poster || "",
+          };
+        });
+      }
+
+      const src = String(config.mediaSrc || "").trim();
+      if (!src) return [];
+      return [{
+        src,
+        type: mediaTypeFromSource(src, config.mediaType),
+        alt: config.alt || "Sweepstakes spotlight media",
+        poster: config.poster || "",
+      }];
+    }
+
+    function renderSpotlightItem(screen, item, index, total) {
+      const countBadge = total > 1
+        ? `<span class="absolute right-4 top-4 z-[4] rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs font-black text-white/75">${index + 1}/${total}</span>`
+        : "";
+
+      if (item.type === "video") {
+        const poster = item.poster ? ` poster="${escapeHtml(item.poster)}"` : "";
+        screen.innerHTML = `${countBadge}<video class="broadcast-media broadcast-fade" src="${escapeHtml(item.src)}"${poster} controls playsinline loop preload="metadata"></video>`;
+        return;
+      }
+
+      screen.innerHTML = `${countBadge}<img class="broadcast-media broadcast-fade" src="${escapeHtml(item.src)}" alt="${escapeHtml(item.alt)}">`;
+    }
+
     function renderSpotlight() {
       const section = document.getElementById("spotlight");
       const screen = document.getElementById("spotlightScreen");
@@ -570,36 +627,43 @@
         return;
       }
 
-      const mediaSrc = String(config.mediaSrc || "").trim();
-      const mediaType = mediaTypeFromSource(mediaSrc, config.mediaType);
+      if (spotlightTimer) {
+        clearInterval(spotlightTimer);
+        spotlightTimer = null;
+      }
 
       document.getElementById("spotlightLabel").textContent = config.label || "Fan TV";
       document.getElementById("spotlightHeadline").textContent = config.headline || "Tonight's Meme Screen";
       document.getElementById("spotlightCaption").textContent = config.caption || "Swap in any image, GIF, or video clip.";
-      document.getElementById("spotlightFormat").textContent = mediaType === "placeholder" ? "Ready" : mediaType.toUpperCase();
       document.getElementById("spotlightMood").textContent = config.mood || "On";
 
-      if (!mediaSrc || mediaType === "placeholder") {
+      const items = spotlightMediaItems(config).filter(item => item.type !== "placeholder");
+      document.getElementById("spotlightFormat").textContent = items.length > 1 ? `${items.length} Slides` : (items[0]?.type || "Ready").toUpperCase();
+
+      if (!items.length) {
         screen.innerHTML = `
           <div class="grid h-full place-items-center px-5 text-center">
             <div>
               <p class="text-sm font-black uppercase tracking-[.3em] text-cyan-100/70">Broadcast Insert</p>
               <p class="mt-4 text-5xl font-black leading-none text-white sm:text-7xl">Cape Verde</p>
               <p class="mt-2 text-4xl font-black text-trophy sm:text-6xl">1-1 Spain</p>
-              <p class="mx-auto mt-5 max-w-xl text-sm font-bold uppercase tracking-[.18em] text-white/58">Put your GIF, image, or video file in this folder and set CONFIG.spotlight.mediaSrc</p>
+              <p class="mx-auto mt-5 max-w-xl text-sm font-bold uppercase tracking-[.18em] text-white/58">Put your files in this folder and add them to CONFIG.spotlight.mediaItems</p>
             </div>
           </div>
         `;
         return;
       }
 
-      if (mediaType === "video") {
-        const poster = config.poster ? ` poster="${escapeHtml(config.poster)}"` : "";
-        screen.innerHTML = `<video class="broadcast-media" src="${escapeHtml(mediaSrc)}"${poster} controls playsinline loop preload="metadata"></video>`;
-        return;
-      }
+      let currentIndex = 0;
+      renderSpotlightItem(screen, items[currentIndex], currentIndex, items.length);
 
-      screen.innerHTML = `<img class="broadcast-media" src="${escapeHtml(mediaSrc)}" alt="${escapeHtml(config.alt || "Sweepstakes spotlight media")}">`;
+      if (items.length > 1) {
+        const interval = Math.max(5, Number(config.rotateSeconds) || 7) * 1000;
+        spotlightTimer = setInterval(() => {
+          currentIndex = (currentIndex + 1) % items.length;
+          renderSpotlightItem(screen, items[currentIndex], currentIndex, items.length);
+        }, interval);
+      }
     }
 
     function allSweepstakesTeams() {
