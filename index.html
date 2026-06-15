@@ -93,6 +93,56 @@
       width: max-content;
     }
 
+    .broadcast-shell {
+      border: 1px solid rgba(247, 201, 72, .28);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.045)),
+        linear-gradient(180deg, rgba(7,24,17,.8), rgba(0,0,0,.58));
+      box-shadow: 0 24px 90px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.16);
+      backdrop-filter: blur(18px);
+    }
+
+    .broadcast-screen {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.16);
+      background:
+        radial-gradient(circle at 50% 12%, rgba(83, 245, 208, .18), transparent 16rem),
+        linear-gradient(145deg, #04100b, #020504 58%, #0e150b);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), inset 0 -34px 70px rgba(0,0,0,.42);
+    }
+
+    .broadcast-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      background-image: linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px);
+      background-size: 100% 5px;
+      opacity: .22;
+      mix-blend-mode: screen;
+    }
+
+    .broadcast-screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      background:
+        linear-gradient(115deg, rgba(255,255,255,.18), transparent 26%, transparent 72%, rgba(255,255,255,.08)),
+        radial-gradient(circle at center, transparent 48%, rgba(0,0,0,.56) 100%);
+    }
+
+    .broadcast-media {
+      display: block;
+      height: 100%;
+      width: 100%;
+      background: #020504;
+      object-fit: contain;
+    }
+
     @keyframes ticker {
       from { transform: translate3d(0, -50%, 0); }
       to { transform: translate3d(-50%, -50%, 0); }
@@ -153,6 +203,7 @@
       </a>
       <nav class="hidden items-center gap-5 text-sm text-white/70 md:flex">
         <a class="hover:text-white" href="#leaderboard">Leaderboard</a>
+        <a class="hover:text-white" href="#spotlight">TV</a>
         <a class="hover:text-white" href="#teams">Teams</a>
         <a class="hover:text-white" href="#matches">Matches</a>
       </nav>
@@ -215,6 +266,42 @@
             <div class="glass rounded-2xl p-4">
               <p class="text-xs uppercase tracking-[.16em] text-white/45">Prize Pot</p>
               <p class="mt-1 text-3xl font-black">900</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="spotlight" class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div class="broadcast-shell rounded-3xl p-4 sm:p-5">
+          <div class="grid gap-5 lg:grid-cols-[1.2fr_.8fr] lg:items-stretch">
+            <div class="broadcast-screen aspect-video rounded-2xl">
+              <div id="spotlightScreen" class="relative z-[1] h-full w-full"></div>
+            </div>
+
+            <div class="flex flex-col justify-between gap-5 rounded-2xl border border-white/10 bg-black/25 p-5">
+              <div>
+                <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-trophy/30 bg-trophy/10 px-3 py-2 text-xs font-black uppercase tracking-[.18em] text-trophy">
+                  <span class="h-2 w-2 rounded-full bg-trophy"></span>
+                  <span id="spotlightLabel">Fan TV</span>
+                </div>
+                <h2 id="spotlightHeadline" class="text-3xl font-black leading-tight text-white sm:text-4xl">Tonight's Meme Screen</h2>
+                <p id="spotlightCaption" class="mt-4 leading-7 text-white/62">Drop in a GIF, image, or video clip and the page turns it into a tiny sports bar.</p>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3">
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p class="text-xs uppercase tracking-[.16em] text-white/45">Format</p>
+                  <p id="spotlightFormat" class="mt-1 text-lg font-black text-white">Auto</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p class="text-xs uppercase tracking-[.16em] text-white/45">Swap</p>
+                  <p class="mt-1 text-lg font-black text-white">1 file</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p class="text-xs uppercase tracking-[.16em] text-white/45">Vibe</p>
+                  <p id="spotlightMood" class="mt-1 text-lg font-black text-trophy">On</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -326,6 +413,8 @@
         </div>
       </section>
 
+    </main>
+
     <footer class="mx-auto max-w-7xl px-4 py-10 text-center text-sm text-white/52 sm:px-6 lg:px-8">
       <p class="font-semibold">Built for bragging rights, heartbreak, and suspicious VAR decisions.</p>
       <p class="mt-2">Last updated: <span id="lastUpdated">Checking data source</span></p>
@@ -351,8 +440,18 @@
         tournamentStart: "2026-06-11",
         tournamentEnd: "2026-07-19",
         daysAhead: 14,
-        cacheMinutes: 30,
         cacheKey: "wc-sweepstakes-hq-espn-cache-v1",
+      },
+      spotlight: {
+        enabled: true,
+        label: "Fan TV",
+        headline: "Cape Verde Held Spain. This Is Not A Drill.",
+        caption: "Replace the screen with any local GIF, image, MP4, or WebM by changing mediaSrc and mediaType here.",
+        mood: "Chaos",
+        mediaType: "placeholder", // placeholder, image, gif, video
+        mediaSrc: "", // Example: "cape-verde.gif", "var-celebration.mp4", or "meme.png"
+        poster: "", // Optional still image for video files.
+        alt: "Cape Verde draw celebration",
       },
       scoringRules: [
         { label: "Group win", points: 2, note: "Total group wins, 2 points each" },
@@ -398,7 +497,6 @@
         "Bosnia-Herzegovina": "Bosnia & H",
         "Cabo Verde": "Cape Verde",
         "Cape Verde": "Cape Verde",
-        "Canada": "Canada",
         "Congo DR": "DR Congo",
         "Congo Democratic Republic": "DR Congo",
         "Côte d'Ivoire": "Ivory Coast",
@@ -409,11 +507,9 @@
         "Czech Republic": "Czech Rep",
         "IR Iran": "Iran",
         "Iran": "Iran",
-        "Ivory Coast": "Ivory Coast",
         "Korea Republic": "S. Korea",
         "South Korea": "S. Korea",
         "Saudi Arabia": "Saudi Arabia",
-        "Sweden": "Sweden",
         "Türkiye": "Turkey",
         "Turkiye": "Turkey",
         "United States": "USA",
@@ -455,6 +551,57 @@
         .replaceAll("'", "&#039;");
     }
 
+    function mediaTypeFromSource(source, configuredType) {
+      const type = String(configuredType || "").toLowerCase();
+      if (["image", "gif", "video", "placeholder"].includes(type)) return type;
+      const extension = source.split("?")[0].split(".").pop()?.toLowerCase();
+      if (["mp4", "webm", "ogg", "mov"].includes(extension)) return "video";
+      if (extension === "gif") return "gif";
+      if (["png", "jpg", "jpeg", "webp", "avif"].includes(extension)) return "image";
+      return "placeholder";
+    }
+
+    function renderSpotlight() {
+      const section = document.getElementById("spotlight");
+      const screen = document.getElementById("spotlightScreen");
+      const config = CONFIG.spotlight;
+      if (!section || !screen || !config?.enabled) {
+        section?.remove();
+        return;
+      }
+
+      const mediaSrc = String(config.mediaSrc || "").trim();
+      const mediaType = mediaTypeFromSource(mediaSrc, config.mediaType);
+
+      document.getElementById("spotlightLabel").textContent = config.label || "Fan TV";
+      document.getElementById("spotlightHeadline").textContent = config.headline || "Tonight's Meme Screen";
+      document.getElementById("spotlightCaption").textContent = config.caption || "Swap in any image, GIF, or video clip.";
+      document.getElementById("spotlightFormat").textContent = mediaType === "placeholder" ? "Ready" : mediaType.toUpperCase();
+      document.getElementById("spotlightMood").textContent = config.mood || "On";
+
+      if (!mediaSrc || mediaType === "placeholder") {
+        screen.innerHTML = `
+          <div class="grid h-full place-items-center px-5 text-center">
+            <div>
+              <p class="text-sm font-black uppercase tracking-[.3em] text-cyan-100/70">Broadcast Insert</p>
+              <p class="mt-4 text-5xl font-black leading-none text-white sm:text-7xl">Cape Verde</p>
+              <p class="mt-2 text-4xl font-black text-trophy sm:text-6xl">1-1 Spain</p>
+              <p class="mx-auto mt-5 max-w-xl text-sm font-bold uppercase tracking-[.18em] text-white/58">Put your GIF, image, or video file in this folder and set CONFIG.spotlight.mediaSrc</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (mediaType === "video") {
+        const poster = config.poster ? ` poster="${escapeHtml(config.poster)}"` : "";
+        screen.innerHTML = `<video class="broadcast-media" src="${escapeHtml(mediaSrc)}"${poster} controls playsinline loop preload="metadata"></video>`;
+        return;
+      }
+
+      screen.innerHTML = `<img class="broadcast-media" src="${escapeHtml(mediaSrc)}" alt="${escapeHtml(config.alt || "Sweepstakes spotlight media")}">`;
+    }
+
     function allSweepstakesTeams() {
       return CONFIG.players.flatMap(player => player.teams);
     }
@@ -488,29 +635,23 @@
       return dates;
     }
 
-function readDailyCache(todayKey) {
-  try {
-    const cached = JSON.parse(localStorage.getItem(CONFIG.api.cacheKey) || "null");
-    const ageMs = Date.now() - (cached?.savedAt || 0);
-    const maxAgeMs = CONFIG.api.cacheMinutes * 60 * 1000;
-    if (cached?.fetchedFor === todayKey && cached?.data && ageMs < maxAgeMs) return cached.data;
-  } catch (error) {
-    console.warn("Could not read ESPN cache", error);
-  }
-  return null;
-}
+    function readDailyCache(todayKey) {
+      try {
+        const cached = JSON.parse(localStorage.getItem(CONFIG.api.cacheKey) || "null");
+        if (cached?.fetchedFor === todayKey && cached?.data) return cached.data;
+      } catch (error) {
+        console.warn("Could not read ESPN cache", error);
+      }
+      return null;
+    }
 
-function writeDailyCache(todayKey, data) {
-  try {
-    localStorage.setItem(CONFIG.api.cacheKey, JSON.stringify({
-      fetchedFor: todayKey,
-      savedAt: Date.now(),
-      data
-    }));
-  } catch (error) {
-    console.warn("Could not write ESPN cache", error);
-  }
-}
+    function writeDailyCache(todayKey, data) {
+      try {
+        localStorage.setItem(CONFIG.api.cacheKey, JSON.stringify({ fetchedFor: todayKey, data }));
+      } catch (error) {
+        console.warn("Could not write ESPN cache", error);
+      }
+    }
 
     async function fetchEspnScoreboards() {
       const today = new Date();
@@ -520,7 +661,7 @@ function writeDailyCache(todayKey, data) {
         new Date(`${CONFIG.api.tournamentEnd}T12:00:00Z`).getTime()
       )));
       const cached = readDailyCache(todayIso);
-      if (cached) return { ...cached, cacheStatus: "Using recently cached ESPN data" };
+      if (cached) return { ...cached, cacheStatus: "Using today's cached ESPN data" };
 
       const dates = daysBetween(CONFIG.api.tournamentStart, fetchThrough);
       const requests = dates.map(async date => {
@@ -972,16 +1113,6 @@ function writeDailyCache(todayKey, data) {
       update();
     }
 
-    function renderConfigPreview() {
-      const preview = {
-        api: CONFIG.api,
-        scoringRules: CONFIG.scoringRules,
-        players: CONFIG.players,
-        teamAliases: CONFIG.teamAliases,
-      };
-      document.getElementById("configPreview").textContent = JSON.stringify(preview, null, 2);
-    }
-
     function renderSourceStatus(data) {
       document.getElementById("sourceBadge").lastChild.textContent = data.sourceStatus?.includes("unavailable") ? "Data unavailable" : "ESPN data";
       document.getElementById("statusLine").textContent = data.sourceStatus || "Checked ESPN once-daily cache";
@@ -990,6 +1121,7 @@ function writeDailyCache(todayKey, data) {
     }
 
     async function init() {
+      renderSpotlight();
       const data = await fetchWorldCupData();
       const standings = calculateLeaderboard(data);
       renderHero(standings[0]);
