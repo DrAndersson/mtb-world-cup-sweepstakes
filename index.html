@@ -462,15 +462,16 @@
           enabled: true,
           basePath: "fan-tv",
           timeZone: "Europe/Stockholm",
-          maxItems: 8,
-          extensions: ["png", "jpg", "jpeg", "webp", "gif", "mp4", "webm"],
+          maxItems: 3,
+          extensions: ["png"],
         },
         mediaItems: [
-          { type: "image", src: "cape-verde.png", alt: "Cape Verde draw celebration" },
-          { type: "image", src: "peyman-ludvig.png", alt: "Peyman vs Ludvig clash" },
+          { type: "image", src: "1.png", alt: "Fan TV image 1" },
+          { type: "image", src: "2.png", alt: "Fan TV image 2" },
+          { type: "image", src: "3.png", alt: "Fan TV image 3" },
         ],
         mediaType: "image", // placeholder, image, gif, video
-        mediaSrc: "cape-verde.png", // Fallback if mediaItems is empty.
+        mediaSrc: "1.png", // Fallback if mediaItems is empty.
         poster: "", // Optional still image for video files.
         alt: "Cape Verde draw celebration",
       },
