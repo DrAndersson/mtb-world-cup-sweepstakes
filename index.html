@@ -458,6 +458,13 @@
         caption: "...also, big showoff between Peyman and Ludvig. Major moves tonight!",
         mood: "Chaos",
         rotateSeconds: 7,
+        dailyFolder: {
+          enabled: true,
+          basePath: "fan-tv",
+          timeZone: "Europe/Stockholm",
+          maxItems: 8,
+          extensions: ["png", "jpg", "jpeg", "webp", "gif", "mp4", "webm"],
+        },
         mediaItems: [
           { type: "image", src: "cape-verde.png", alt: "Cape Verde draw celebration" },
           { type: "image", src: "peyman-ludvig.png", alt: "Peyman vs Ludvig clash" },
@@ -577,7 +584,61 @@
       return "placeholder";
     }
 
-    function spotlightMediaItems(config) {
+    function dateKeyInTimeZone(date, timeZone) {
+      const parts = new Intl.DateTimeFormat("en", {
+        timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).formatToParts(date).reduce((acc, part) => {
+        acc[part.type] = part.value;
+        return acc;
+      }, {});
+      return `${parts.year}-${parts.month}-${parts.day}`;
+    }
+
+    async function mediaExists(src) {
+      if (window.location.protocol === "file:") return false;
+      try {
+        const response = await fetch(src, { method: "HEAD", cache: "no-store" });
+        return response.ok;
+      } catch (error) {
+        console.warn("Could not check Fan TV media", src, error);
+        return false;
+      }
+    }
+
+    async function dailySpotlightItems(config) {
+      const daily = config.dailyFolder;
+      if (!daily?.enabled) return [];
+
+      const dateKey = dateKeyInTimeZone(new Date(), daily.timeZone || "Europe/Stockholm");
+      const basePath = String(daily.basePath || "fan-tv").replace(/\/$/, "");
+      const maxItems = Math.max(1, Number(daily.maxItems) || 8);
+      const extensions = Array.isArray(daily.extensions) && daily.extensions.length
+        ? daily.extensions
+        : ["png", "jpg", "jpeg", "webp", "gif", "mp4", "webm"];
+      const items = [];
+
+      for (let index = 1; index <= maxItems; index += 1) {
+        for (const extension of extensions) {
+          const src = `${basePath}/${dateKey}/${index}.${extension}`;
+          if (await mediaExists(src)) {
+            items.push({
+              src: `${src}?v=${dateKey}`,
+              type: mediaTypeFromSource(src),
+              alt: `Fan TV ${dateKey} slide ${index}`,
+              poster: "",
+            });
+            break;
+          }
+        }
+      }
+
+      return items;
+    }
+
+    function configuredSpotlightItems(config) {
       const configuredItems = Array.isArray(config.mediaItems)
         ? config.mediaItems.filter(item => String(item.src || "").trim())
         : [];
@@ -604,6 +665,11 @@
       }];
     }
 
+    async function spotlightMediaItems(config) {
+      const dailyItems = await dailySpotlightItems(config);
+      return dailyItems.length ? dailyItems : configuredSpotlightItems(config);
+    }
+
     function renderSpotlightItem(screen, item, index, total) {
       const countBadge = total > 1
         ? `<span class="absolute right-4 top-4 z-[4] rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs font-black text-white/75">${index + 1}/${total}</span>`
@@ -618,7 +684,7 @@
       screen.innerHTML = `${countBadge}<img class="broadcast-media broadcast-fade" src="${escapeHtml(item.src)}" alt="${escapeHtml(item.alt)}">`;
     }
 
-    function renderSpotlight() {
+    async function renderSpotlight() {
       const section = document.getElementById("spotlight");
       const screen = document.getElementById("spotlightScreen");
       const config = CONFIG.spotlight;
@@ -637,7 +703,7 @@
       document.getElementById("spotlightCaption").textContent = config.caption || "Swap in any image, GIF, or video clip.";
       document.getElementById("spotlightMood").textContent = config.mood || "On";
 
-      const items = spotlightMediaItems(config).filter(item => item.type !== "placeholder");
+      const items = (await spotlightMediaItems(config)).filter(item => item.type !== "placeholder");
       document.getElementById("spotlightFormat").textContent = items.length > 1 ? `${items.length} Slides` : (items[0]?.type || "Ready").toUpperCase();
 
       if (!items.length) {
@@ -779,6 +845,10 @@
       return null;
     }
 
+    function isKnockoutStage(stage) {
+      return Boolean(knockoutKey(stage));
+    }
+
     function ensureTeam(performance, team) {
       if (!performance[team]) {
         performance[team] = { status: "Upcoming", groupWins: 0, groupDraws: 0, recent: 0, alive: true };
@@ -842,6 +912,15 @@
           matches.push(match);
 
           [homeName, awayName].forEach(team => ensureTeam(teamPerformance, team));
+          const group = getGroupName(stage);
+
+          if (!group && isKnockoutStage(stage)) {
+            [homeName, awayName].forEach(team => {
+              const perf = ensureTeam(teamPerformance, team);
+              perf.reachedR32 = true;
+              if (perf.status === "Upcoming") perf.status = "Qualified";
+            });
+          }
 
           if (state === "in") {
             teamPerformance[homeName].status = "Playing";
@@ -853,7 +932,6 @@
           const homePerf = ensureTeam(teamPerformance, homeName);
           const awayPerf = ensureTeam(teamPerformance, awayName);
           const drew = homeScore === awayScore;
-          const group = getGroupName(stage);
 
           if (drew) {
             homePerf.status = "Drew";
@@ -908,27 +986,52 @@
         });
       });
 
-      Object.values(groupTables).forEach(group => {
+      const thirdPlaceRows = [];
+      let completedGroupCount = 0;
+
+      Object.entries(groupTables).forEach(([groupName, group]) => {
         const table = Object.values(group).sort((a, b) =>
           b.points - a.points || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf || a.team.localeCompare(b.team)
         );
         const groupComplete = table.length >= 4 && table.every(row => row.played >= 3);
         if (!groupComplete) return;
+        completedGroupCount += 1;
         table.forEach((row, index) => {
           const perf = ensureTeam(teamPerformance, row.team);
           perf.groupPosition = index + 1;
           if (index === 0) {
             perf.status = "Qualified";
+            perf.reachedR32 = true;
           } else if (index === 1) {
             perf.status = "Qualified";
+            perf.reachedR32 = true;
           } else if (index === 2) {
-            perf.thirdQualified = false;
+            thirdPlaceRows.push({ ...row, groupName });
           } else if (index > 2) {
             perf.status = "Eliminated";
             perf.alive = false;
           }
         });
       });
+
+      if (completedGroupCount === 12) {
+        thirdPlaceRows
+          .sort((a, b) =>
+            b.points - a.points || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf || a.team.localeCompare(b.team)
+          )
+          .forEach((row, index) => {
+            const perf = ensureTeam(teamPerformance, row.team);
+            if (index < 8) {
+              perf.status = "Qualified";
+              perf.thirdQualified = true;
+              perf.reachedR32 = true;
+            } else {
+              perf.thirdQualified = false;
+              perf.status = "Eliminated";
+              perf.alive = false;
+            }
+          });
+      }
 
       const latest = matches.filter(match => match.type === "latest").sort((a, b) => b.sortTime - a.sortTime).slice(0, 6);
       const today = matches.filter(match => match.type === "today").sort((a, b) => a.sortTime - b.sortTime);
@@ -971,20 +1074,79 @@
       return score;
     }
 
+    function scoreBreakdown(performance = {}) {
+      const items = [];
+      const groupWins = performance.groupWins || 0;
+      const groupDraws = performance.groupDraws || 0;
+
+      if (groupWins) {
+        items.push({
+          label: "Group win",
+          points: groupWins * 2,
+          detail: `${groupWins} win${groupWins === 1 ? "" : "s"} x 2 pts`,
+        });
+      }
+      if (groupDraws) {
+        items.push({
+          label: "Group draw",
+          points: groupDraws,
+          detail: `${groupDraws} draw${groupDraws === 1 ? "" : "s"} x 1 pt`,
+        });
+      }
+      if (performance.groupPosition === 1) {
+        items.push({ label: "Group winner bonus", points: 4, detail: "Finished 1st in group" });
+      }
+      if (performance.groupPosition === 2) {
+        items.push({ label: "Group runner-up bonus", points: 2, detail: "Finished 2nd in group" });
+      }
+      if (performance.thirdQualified) {
+        items.push({ label: "Third-place qualifier bonus", points: 1, detail: "Qualified from 3rd place" });
+      }
+      if (performance.reachedR32) {
+        items.push({ label: "Reach round of 32", points: 2, detail: "Reached the first knockout round" });
+      }
+      if (performance.r32Win) {
+        items.push({ label: "Win round of 32", points: 4, detail: "Won knockout match" });
+      }
+      if (performance.r16Win) {
+        items.push({ label: "Win round of 16", points: 6, detail: "Won knockout match" });
+      }
+      if (performance.qfWin) {
+        items.push({ label: "Win quarter-final", points: 8, detail: "Won knockout match" });
+      }
+      if (performance.semiWin) {
+        items.push({ label: "Win semi-final", points: 10, detail: "Won knockout match" });
+      }
+      if (performance.finalWin) {
+        items.push({ label: "Win final", points: 12, detail: "Won the World Cup final" });
+      }
+      if (performance.runnerUp) {
+        items.push({ label: "Runner-up final", points: 6, detail: "Lost the World Cup final" });
+      }
+      if (performance.thirdPlaceWin) {
+        items.push({ label: "Win third-place final", points: 3, detail: "Won the third-place playoff" });
+      }
+
+      return items;
+    }
+
     function calculateLeaderboard(data) {
       return CONFIG.players.map(player => {
         const teams = player.teams.map(team => {
           const performance = data.teamPerformance[team] || { status: "Upcoming", alive: true };
+          const breakdown = scoreBreakdown(performance);
           return {
             name: team,
             ...performance,
             points: scoreTeam(performance),
+            breakdown,
           };
         });
         const total = teams.reduce((sum, team) => sum + team.points, 0);
         const recent = teams.reduce((sum, team) => sum + (team.recent || 0), 0);
         const alive = teams.filter(team => team.alive && team.status !== "Eliminated").length;
-        return { ...player, teams, total, recent, alive };
+        const breakdownTotal = teams.reduce((sum, team) => sum + team.breakdown.reduce((teamSum, item) => teamSum + item.points, 0), 0);
+        return { ...player, teams, total, recent, alive, breakdownTotal };
       }).sort((a, b) => b.total - a.total || b.alive - a.alive || a.name.localeCompare(b.name))
         .map((player, index) => ({ ...player, rank: index + 1 }));
     }
@@ -1006,6 +1168,47 @@
       document.getElementById("leaderPoints").textContent = leader.total;
       document.getElementById("leaderAlive").textContent = `${leader.alive}/4`;
       document.getElementById("leaderTeams").innerHTML = leader.teams.map(team => teamPill(team.name, team.status)).join("");
+    }
+
+    function renderPointBreakdown(player) {
+      const rows = player.teams.map(team => {
+        const awards = team.breakdown.length
+          ? team.breakdown.map(item => `
+            <li class="flex items-start justify-between gap-3 rounded-xl bg-white/5 px-3 py-2">
+              <span>
+                <span class="block font-bold text-white/86">${escapeHtml(item.label)}</span>
+                <span class="block text-xs text-white/45">${escapeHtml(item.detail)}</span>
+              </span>
+              <span class="shrink-0 rounded-full bg-trophy/15 px-2.5 py-1 text-xs font-black text-trophy">+${item.points}</span>
+            </li>
+          `).join("")
+          : `<li class="rounded-xl bg-white/5 px-3 py-2 text-sm text-white/45">No points awarded yet.</li>`;
+
+        return `
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-3">
+            <div class="mb-2 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <p class="truncate font-black text-white">${escapeHtml(team.name)}</p>
+                <p class="text-xs text-white/45">${escapeHtml(team.status)} status</p>
+              </div>
+              <span class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-sm font-black text-white">${team.points} pts</span>
+            </div>
+            <ul class="grid gap-2">${awards}</ul>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <details class="mt-5 rounded-2xl border border-white/10 bg-black/20">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-black text-white/78">
+            <span>Point Details</span>
+            <span class="rounded-full bg-trophy/15 px-3 py-1 text-xs text-trophy">${player.total} pts</span>
+          </summary>
+          <div class="grid gap-3 border-t border-white/10 p-3">
+            ${rows}
+          </div>
+        </details>
+      `;
     }
 
     function renderTicker(matches) {
@@ -1054,6 +1257,7 @@
             </div>
           </div>
           <div class="flex flex-wrap gap-2">${player.teams.map(team => teamPill(team.name, team.status)).join("")}</div>
+          ${renderPointBreakdown(player)}
         </article>`;
       }).join("");
 
@@ -1185,7 +1389,7 @@
     }
 
     async function init() {
-      renderSpotlight();
+      await renderSpotlight();
       const data = await fetchWorldCupData();
       const standings = calculateLeaderboard(data);
       renderHero(standings[0]);
